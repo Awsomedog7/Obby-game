@@ -47,6 +47,9 @@ player_y = SCREEN_HEIGHT - PLAYER_HEIGHT
 player_vel_x = 0
 player_vel_y = 0
 
+# Flag to indicate if collisions with black blocks are enabled
+enable_collisions = True
+
 while running:
     # Handle events
     for event in pygame.event.get():
@@ -66,6 +69,9 @@ while running:
         player_vel_y = -10
     if keys[pygame.K_UP] and player_y >= SCREEN_HEIGHT - PLAYER_HEIGHT:
         player_vel_y = -10
+        enable_collisions = False
+    else:
+        enable_collisions = True
 
     player_x += player_vel_x
     player_y += player_vel_y
@@ -82,13 +88,13 @@ while running:
             if level_data[row][col] == 'B':
                 obstacle_rect = pygame.Rect(col * PLAYER_WIDTH, row * PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT)
                 player_rect = pygame.Rect(player_x, player_y, PLAYER_WIDTH, PLAYER_HEIGHT)
-                if player_rect.colliderect(obstacle_rect):
+                if enable_collisions and player_rect.colliderect(obstacle_rect):
                     # Collision detected! Player Dies
                     pygame.quit()
             elif level_data[row][col] == 'X':
                 obstacle_rect = pygame.Rect(col * PLAYER_WIDTH, row * PLAYER_HEIGHT, PLAYER_WIDTH, PLAYER_HEIGHT)
                 player_rect = pygame.Rect(player_x, player_y, PLAYER_WIDTH, PLAYER_HEIGHT)
-                if player_rect.colliderect(obstacle_rect):
+                if enable_collisions and player_rect.colliderect(obstacle_rect):
                     # Collision detected! Block is solid to player
                     if player_vel_y > 0:
                         # Player is moving downward, stop vertical velocity
@@ -96,7 +102,7 @@ while running:
                         player_vel_y = 0
                     elif player_vel_y < 0:
                         # Player is moving upward, stop vertical velocity
-                        player_y = obstacle_rect.y + PLAYER_HEIGHT
+                        player_y = obstacle_rect.y + obstacle_rect.height
                         player_vel_y = 0
 
     # Fill the background color
